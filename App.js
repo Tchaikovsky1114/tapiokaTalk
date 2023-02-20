@@ -1,20 +1,46 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font'
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AppNavigator from './navigator/AppNavigator';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+
+  const [appIsLoaded, setAppIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const prepare = async () => {
+      try {
+        await Font.loadAsync({
+          "black": require("./assets/fonts/NotoSansKR-Black.otf"),
+          "bold": require("./assets/fonts/NotoSansKR-Bold.otf")
+        })  
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setAppIsLoaded(true)
+      }
+      
+    }
+    prepare();
+  },[])
+
+  const onLayout = useCallback(async () => {
+    if (appIsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  },[appIsLoaded])
+
+  if(!appIsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+      <SafeAreaProvider onLayout={onLayout} >
+        <AppNavigator />
+      </SafeAreaProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
