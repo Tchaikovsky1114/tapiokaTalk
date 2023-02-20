@@ -10,17 +10,20 @@ import {
   KeyboardAvoidingView,
   useWindowDimensions,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import backgroundImage from '../assets/images/tapioca-pearls.jpg';
 import { Octicons } from '@expo/vector-icons';
 import colors from '../constants/colors';
-
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const ChatScreen = () => {
   const [inputMessage, setInputMessage] = useState('');
   const { height } = useWindowDimensions();
 
+  const sendMessage = useCallback(() => {
+    setInputMessage("");
+  },[inputMessage])
   
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -80,6 +83,22 @@ const ChatScreen = () => {
             }}
           >
             <SimpleLineIcons name="camera" size={24} color={colors.default} />
+          </TouchableOpacity>
+        )}
+        {inputMessage && (
+          <TouchableOpacity
+            onPress={sendMessage}
+            style={{
+              width: 32,
+              height:32,
+              padding:4,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: colors.active,
+              borderRadius:32,
+            }}
+          >
+            <MaterialCommunityIcons name="send" size={18} color="#fff" style={{transform:[{rotate: '-30deg'}]}} />
           </TouchableOpacity>
         )}
       </KeyboardAvoidingView>
