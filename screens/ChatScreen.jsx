@@ -71,6 +71,7 @@ const ChatScreen = () => {
           }}
           cursorColor={colors.active}
           onChangeText={(text) => setInputMessage(text)}
+          onSubmitEditing={sendMessage}
         />
 
         {!inputMessage && (

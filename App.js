@@ -15,7 +15,11 @@ export default function App() {
       try {
         await Font.loadAsync({
           "black": require("./assets/fonts/NotoSansKR-Black.otf"),
-          "bold": require("./assets/fonts/NotoSansKR-Bold.otf")
+          "bold": require("./assets/fonts/NotoSansKR-Bold.otf"),
+          "Regular": require("./assets/fonts/NotoSansKR-Regular.otf"),
+          "Medium": require("./assets/fonts/NotoSansKR-Medium.otf"),
+          "Thin": require("./assets/fonts/NotoSansKR-Thin.otf"),
+          "Light": require("./assets/fonts/NotoSansKR-Light.otf"),
         })  
       } catch (error) {
         console.warn(error);
