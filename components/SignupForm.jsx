@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react';
+import React, { useCallback, useReducer, useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import PageContainer from './common/PageContainer';
@@ -6,28 +6,9 @@ import colors from '../constants/colors';
 import Input from './common/Input';
 import SubmitButton from './common/SubmitButton';
 import { validateInput } from '../util/formActions';
+import { reducer } from '../util/reducer/formReducer';
 
-const reducer = (state, action) => {
-  const {validationResult,name} = action;
 
-  const updatedValidities = {
-    ...state.validities,
-    [name]: validationResult,
-  }
-  let updatedFormIsValid = true;
-
-  for(const key in updatedValidities) {
-    if(updatedValidities[key] !== undefined) {
-      updatedFormIsValid = false;
-      break;
-    }
-  }
-
-  return {
-    validities: updatedValidities,
-    formIsValid: updatedFormIsValid
-  };
-}
 
 const initialState = {
   validities:{
@@ -36,7 +17,6 @@ const initialState = {
     password: false,
     passwordConfirm: false,
   },
-  
   formIsValid : false
 }
 
@@ -44,12 +24,11 @@ const SignupForm = () => {
   
   const [formState, dispatch] = useReducer(reducer,initialState)
 
-  const changeInputHandler = (name, value) => {
+  const changeInputHandler = useCallback((name, value) => {
     const result = validateInput(name,value);
     dispatch({name, validationResult: result});
-
-  };
-  console.log(formState);
+  },[dispatch]);
+  
   return (
     <PageContainer style={{ backgroundColor: '#fff' }}>
       <Input
