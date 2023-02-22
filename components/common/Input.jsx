@@ -48,6 +48,7 @@ const Input = ({
           selectionColor={colors.active}
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType || 'default'}
+          value={value}
         />
       </View>
 

@@ -1,6 +1,6 @@
 export const reducer = (state, action) => {
   const {validationResult, name, value} = action;
-  console.log(value);
+  
 
   const updateValues = {
     ...state.values,

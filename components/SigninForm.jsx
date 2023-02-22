@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import PageContainer from './common/PageContainer';
@@ -9,22 +9,33 @@ import SubmitButton from './common/SubmitButton';
 import { validateInput } from '../util/formActions';
 import { reducer } from '../util/reducer/formReducer';
 import { signin } from '../util/authActions';
+import { useDispatch } from 'react-redux';
+import { ActivityIndicator, Alert, View } from 'react-native';
+
+
+
+
+
+const isRememberAuth = false;
 
 const initialState = {
   values: {
-    email: '',
-    password: ''
+    email: isRememberAuth ? 'coco@gmail.com' : '',
+    password: isRememberAuth ? 'coco1234' : ''
   },
   validities: {
-    email: false,
-    password: false,
+    email: isRememberAuth,
+    password: isRememberAuth,
   },
-  formIsValid: false,
+  formIsValid: isRememberAuth,
 };
 
 const SigninForm = () => {
-  const [formState, dispatch] = useReducer(reducer, initialState);
+  const appDispatch = useDispatch();
 
+  const [formState, dispatch] = useReducer(reducer, initialState);
+  const [isLoading,setIsLoading] = useState(false);
+  const [error,setError] = useState('');
   const changeInputHandler = useCallback(
     (name, value) => {
       const result = validateInput(name, value);
@@ -32,10 +43,37 @@ const SigninForm = () => {
     },
     [dispatch]
   );
-  const submitSigninHandler = () => {
-    signin(formState.values.email,formState.values.password)
-  }
+  
+  const submitAuthHandler = useCallback(async () => {  
 
+    try {
+      setIsLoading(true);
+      
+      const signinAction = signin(
+        formState.values.email,
+        formState.values.password,
+        )  
+      await appDispatch(signinAction);
+      
+    } catch (error) {
+      setError(error.message);
+      setIsLoading(false);
+    } 
+  },[appDispatch,formState])
+
+  useEffect(() => {
+    if(error) {
+      Alert.alert(
+        "An Error Occured",
+        error,
+        [
+          {
+            text: "확인"
+          }
+        ]);
+        setError(null);
+    }
+  }, [error])
   return (
     <PageContainer style={{ backgroundColor: '#fff' }}>
       <Input
@@ -46,8 +84,9 @@ const SigninForm = () => {
         icon="email"
         IconPack={Entypo}
         iconSize={18}
+        value={formState.values.email}
         iconColor={colors.default}
-        errorText={formState.validities["email"] && formState.validities["email"].join('\n')}
+        errorText={formState.validities["email"]}
       />
       <Input
         label="비밀번호"
@@ -56,16 +95,22 @@ const SigninForm = () => {
         iconSize={24}
         iconColor={colors.default}
         onChange={changeInputHandler}
+        value={formState.values.password}
         name="password"
         secureTextEntry
-        errorText={formState.validities["password"] && formState.validities["password"].join('\n')}
+        errorText={formState.validities["password"]}
       />
-      <SubmitButton
+      
+      {
+        isLoading
+        ? <View style={{marginTop:24}}><ActivityIndicator size="large" color={colors.secondary} /></View>
+        : <SubmitButton
         buttonText="로그인"
-        onPress={submitSigninHandler}
+        onPress={submitAuthHandler}
         style={{ marginTop: 24 }}
         disabled={!formState.formIsValid}
       />
+      }
     </PageContainer>
   );
 };

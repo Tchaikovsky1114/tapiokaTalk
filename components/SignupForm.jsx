@@ -39,18 +39,17 @@ const SignupForm = () => {
     dispatch({name, validationResult: result, value});
   },[dispatch]);
   
-  const submitAuthHandler = () => {
+  const submitAuthHandler = async () => {
     
     try {
       setIsLoading(true);
-      
       const signupAction = signup(
         formState.values.username,
         formState.values.email,
         formState.values.password,
         formState.values.passwordConfirm,
         )  
-      appDispatch(signupAction);
+      await appDispatch(signupAction);
       setError(null);
     } catch (error) {
       setError(error.message);
