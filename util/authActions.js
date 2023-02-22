@@ -1,24 +1,31 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { auth } from './firebase';
 import { child, getDatabase, ref, set } from 'firebase/database'
+import { authenticate } from '../store/authSlice';
 
-export const signup = async (name, email, password, passwordConfirm) => {
-  try {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    const { uid } = result.user;
+export const signup =  (name, email, password, passwordConfirm) => {
 
-    await createUser(name,email,uid)
-
-  } catch (error) {
-    const errorCode = error.code;
-
-    let message = "Something went wrong.";
-
-    if(errorCode === 'auth/email-already-in-use') {
-      message = "현재 사용중인 이메일입니다."
+  return async (dispatch) => {
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const { uid, stsTokenManager: { accessToken } } = result.user;
+      
+      const userData = await createUser(name,email,uid);
+      console.log('==signup==',userData);
+      dispatch(authenticate({ token: accessToken, userData }));
+  
+    } catch (error) {
+      const errorCode = error.code;
+  
+      let message = "Something went wrong.";
+  
+      if(errorCode === 'auth/email-already-in-use') {
+        message = "현재 사용중인 이메일입니다."
+      }
+      throw new Error(message);
     }
-    throw new Error(message);
   }
+  
 }
 
 

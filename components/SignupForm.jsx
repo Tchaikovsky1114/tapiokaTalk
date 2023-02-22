@@ -9,6 +9,7 @@ import { validateInput } from '../util/formActions';
 import { reducer } from '../util/reducer/formReducer';
 import { signup } from '../util/authActions';
 import { ActivityIndicator, Alert, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 const initialState = {
@@ -28,7 +29,8 @@ const initialState = {
 }
 
 const SignupForm = () => {
-  
+  const appDispatch = useDispatch();
+
   const [formState, dispatch] = useReducer(reducer,initialState)
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -37,16 +39,19 @@ const SignupForm = () => {
     dispatch({name, validationResult: result, value});
   },[dispatch]);
   
-  const submitAuthHandler = async () => {
-
+  const submitAuthHandler = () => {
+    
     try {
       setIsLoading(true);
-      await signup(
+      
+      const signupAction = signup(
         formState.values.username,
         formState.values.email,
         formState.values.password,
         formState.values.passwordConfirm,
         )  
+      appDispatch(signupAction);
+      setError(null);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -64,7 +69,7 @@ const SignupForm = () => {
             text: "확인"
           }
         ]);
-      setError('');
+      
     }
   }, [error])
 
