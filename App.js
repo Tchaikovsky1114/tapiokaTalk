@@ -4,6 +4,8 @@ import * as Font from 'expo-font'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './navigator/AppNavigator';
 import { LogBox } from 'react-native';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 LogBox.ignoreLogs(['AsyncStorage'])
 
@@ -45,9 +47,11 @@ export default function App() {
   }
 
   return (
+    <Provider store={store}>
       <SafeAreaProvider onLayout={onLayout} >
         <AppNavigator />
       </SafeAreaProvider>
+    </Provider>
   );
 }
 
