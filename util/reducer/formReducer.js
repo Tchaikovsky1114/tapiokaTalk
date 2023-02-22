@@ -1,5 +1,11 @@
 export const reducer = (state, action) => {
-  const {validationResult,name} = action;
+  const {validationResult, name, value} = action;
+  console.log(value);
+
+  const updateValues = {
+    ...state.values,
+    [name]: value,
+  }
 
   const updatedValidities = {
     ...state.validities,
@@ -15,6 +21,7 @@ export const reducer = (state, action) => {
   }
 
   return {
+    values: updateValues,
     validities: updatedValidities,
     formIsValid: updatedFormIsValid
   };

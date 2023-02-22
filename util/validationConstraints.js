@@ -35,7 +35,7 @@ export const validateEmail = (value) => {
       length: {
         minimum: 10,
         maximum: 25,
-        message: '이메일은 10자 이상 25자 이하여야 합니다.'
+        message: '^이메일은 10자 이상 25자 이하여야 합니다.'
       }
     },
     

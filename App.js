@@ -3,6 +3,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './navigator/AppNavigator';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs(['AsyncStorage'])
 
 SplashScreen.preventAutoHideAsync();
 

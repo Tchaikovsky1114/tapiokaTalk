@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import colors from '../../constants/colors'
 
 const SubmitButton = ({style, onPress,buttonText,disabled}) => {
@@ -17,4 +16,3 @@ const SubmitButton = ({style, onPress,buttonText,disabled}) => {
 
 export default SubmitButton
 
-const styles = StyleSheet.create({})

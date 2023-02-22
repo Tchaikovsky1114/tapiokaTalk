@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import PageContainer from './common/PageContainer';
@@ -7,10 +7,17 @@ import Input from './common/Input';
 import SubmitButton from './common/SubmitButton';
 import { validateInput } from '../util/formActions';
 import { reducer } from '../util/reducer/formReducer';
-
+import { signup } from '../util/authActions';
+import { ActivityIndicator, Alert, View } from 'react-native';
 
 
 const initialState = {
+  values:{
+    username: '',
+    email: '',
+    password: '',
+    passwordConfirm: '',
+  },
   validities:{
     username: false,
     email: false,
@@ -23,12 +30,44 @@ const initialState = {
 const SignupForm = () => {
   
   const [formState, dispatch] = useReducer(reducer,initialState)
-
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const changeInputHandler = useCallback((name, value) => {
     const result = validateInput(name,value);
-    dispatch({name, validationResult: result});
+    dispatch({name, validationResult: result, value});
   },[dispatch]);
   
+  const submitAuthHandler = async () => {
+
+    try {
+      setIsLoading(true);
+      await signup(
+        formState.values.username,
+        formState.values.email,
+        formState.values.password,
+        formState.values.passwordConfirm,
+        )  
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
+  useEffect(() => {
+    if(error) {
+      Alert.alert(
+        "An Error Occured",
+        error,
+        [
+          {
+            text: "확인"
+          }
+        ]);
+      setError('');
+    }
+  }, [error])
+
   return (
     <PageContainer style={{ backgroundColor: '#fff' }}>
       <Input
@@ -39,6 +78,7 @@ const SignupForm = () => {
         iconColor={colors.default}
         name="username"
         onChange={changeInputHandler}
+        errorText={formState.validities["username"] && formState.validities["username"].join('\n')}
       />
       <Input
         label="이메일"
@@ -49,6 +89,7 @@ const SignupForm = () => {
         name="email"
         onChange={changeInputHandler}
         keyboardType="email-address"
+        errorText={formState.validities["email"] && formState.validities["email"].join('\n')}
       />
       <Input
         label="비밀번호"
@@ -59,6 +100,7 @@ const SignupForm = () => {
         name="password"
         onChange={changeInputHandler}
         secureTextEntry
+        errorText={formState.validities["password"] && formState.validities["password"].join('\n')}
       />
       <Input
         label="비밀번호 확인"
@@ -69,16 +111,23 @@ const SignupForm = () => {
         name="passwordConfirm"
         onChange={changeInputHandler}
         secureTextEntry
+        errorText={formState.validities["passwordConfirm"] && formState.validities["passwordConfirm"].join('\n')}
       />
 
-      <SubmitButton
+      {
+        isLoading
+        ? <View style={{marginTop:24}}><ActivityIndicator size="large" color={colors.secondary} /></View>
+        : <SubmitButton
         buttonText="가입하기"
-        onPress={() => {}}
+        onPress={submitAuthHandler}
         style={{ marginTop: 24 }}
-        disabled={!formState.formIsValid}
+        disabled={!formState.formIsValid || isLoading}
       />
+      }
     </PageContainer>
   );
 };
 
 export default SignupForm;
+
+
