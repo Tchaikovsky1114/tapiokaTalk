@@ -4,7 +4,8 @@ import Constants from 'expo-constants';
 
 const PageContainer = ({children,style}) => {
   return (
-    <View style={{...style,flex:1,paddingHorizontal:24,marginTop:Platform.OS === 'android' ? +Constants.statusBarHeight : 0}}>
+    // Platform.OS === 'android' ? +Constants.statusBarHeight : 0
+    <View style={{...style,backgroundColor:'#fff',flex:1,paddingHorizontal:24,paddingTop: 0}}>
       {children}
     </View>
   )

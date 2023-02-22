@@ -1,13 +1,19 @@
-import { Text, View } from 'react-native'
+
 import React from 'react'
-import commonStyles from '../components/common/commonStyles'
+
 import PageTitle from '../components/common/PageTitle'
+import PageContainer from '../components/common/PageContainer'
+import { TextInput } from 'react-native'
+import Input from '../components/common/Input'
 
 const SettingsScreen = () => {
   return (
-    <View >
+    <PageContainer style={{alignItems:'center'}}>
       <PageTitle text="Settings" />
-    </View>
+      <Input />
+      <Input />
+      <Input />
+    </PageContainer>
   )
 }
 
