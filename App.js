@@ -7,11 +7,11 @@ import { LogBox } from 'react-native';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-
+// AsyncStorage.clear()
 LogBox.ignoreLogs(['AsyncStorage'])
 
 
-// AsyncStorage.clear()
+
 
 SplashScreen.preventAutoHideAsync();
 

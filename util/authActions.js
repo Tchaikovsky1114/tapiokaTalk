@@ -1,7 +1,7 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth, database } from '../firebase';
-import { child, ref, set } from 'firebase/database'
-import { authenticate,logout } from '../store/authSlice';
+import { child, ref, set, update } from 'firebase/database'
+import { authenticate,logout, updateUserData } from '../store/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUserData } from './userActions';
 
@@ -98,6 +98,26 @@ export const userLogout = () => {
     dispatch(logout());
   }
 }
+
+export const updateUser = (userId,updateData) => {
+  console.log('updateData',updateData);
+  const savingName = `${updateData.username.substring(0,1)} ${updateData.username.substring(1)}`
+  const obj = {
+    ...updateData,
+    savingName
+  }
+  return async (dispatch) => {
+    try {
+      const dbRef = ref(database);
+      const userRef = child(dbRef,`/users/${userId}`);
+      await update(userRef,obj)
+      dispatch(updateUserData(obj));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+}
+
 
 const saveDataToStorage = (token, userId, expiryDate) => {
   AsyncStorage.setItem("userData", JSON.stringify({ token, userId, expiryDate: expiryDate.toISOString() }))

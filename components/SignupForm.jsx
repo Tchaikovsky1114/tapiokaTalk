@@ -34,6 +34,7 @@ const SignupForm = () => {
   const [formState, dispatch] = useReducer(reducer,initialState)
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  
   const changeInputHandler = useCallback((name, value) => {
     const result = validateInput(name,value);
     dispatch({name, validationResult: result, value});

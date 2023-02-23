@@ -12,11 +12,7 @@ import { signin } from '../util/authActions';
 import { useDispatch } from 'react-redux';
 import { ActivityIndicator, Alert, View } from 'react-native';
 
-
-
-
-
-const isRememberAuth = false;
+const isRememberAuth = true;
 
 const initialState = {
   values: {

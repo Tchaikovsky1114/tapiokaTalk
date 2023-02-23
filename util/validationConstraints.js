@@ -26,6 +26,25 @@ export const validateString = (id, value) => {
   return validateResult && validateResult[id];
 }
 
+export const validateLength = (id, value, minimum, maximum, allowEmpty) => {
+  const constraints = {
+    presence : { allowEmpty },
+    length: {
+      
+    }
+  }
+  
+
+  if(!allowEmpty || value) {
+    constraints.length.minimum = minimum;
+    constraints.length.maximum = maximum;
+    constraints.length.message = `^ ${maximum}자 이하로 적어주세요.`
+  }
+  const validateResult = validate({[id]: value}, { [id]: constraints })
+  
+  return validateResult && validateResult[id];
+}
+
 export const validateEmail = (value) => {
   const constraints = {
     from: {

@@ -14,7 +14,10 @@ const Input = ({
   value,
   onChange,
   secureTextEntry,
-  keyboardType
+  keyboardType,
+  numberOfLines,
+  height,
+  multiline,
 }) => {
   return (
     <View style={{ width: '100%', marginTop: 12, justifyContent: 'center' }}>
@@ -43,8 +46,9 @@ const Input = ({
         </View>
         <TextInput
           onChange={({ nativeEvent: { text } }) => onChange(name, text)}
-          style={{ flex: 1, fontWeight: 'bold', fontSize: 18 }}
-          numberOfLines={1}
+          style={{ flex: 1, fontWeight: 'bold', fontSize: 18, height:height || null }}
+          numberOfLines={numberOfLines || 1}
+          multiline={multiline || null}
           selectionColor={colors.active}
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType || 'default'}

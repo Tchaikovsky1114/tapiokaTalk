@@ -1,4 +1,4 @@
-import { validateEmail, validatePassword, validatePasswordConfirm, validateString } from "./validationConstraints";
+import { validateEmail, validateLength, validatePassword, validatePasswordConfirm, validateString } from "./validationConstraints";
 
 let pw = 'qweqweqwe';
 export const validateInput = (name, value) => {
@@ -12,5 +12,8 @@ export const validateInput = (name, value) => {
     return validatePassword(name, value);
   } else if (name === 'passwordConfirm') {
     return validatePasswordConfirm(pw, value);
+  } else if (name === 'me') {
+    
+    return validateLength(name, value, 0, 150, true)
   }
 }
