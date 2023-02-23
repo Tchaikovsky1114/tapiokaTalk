@@ -1,8 +1,9 @@
 import * as ImagePicker from 'expo-image-picker';
-import { ref } from 'firebase/database';
-import { Platform } from 'react-native';
-import { database } from '../firebase';
 
+import {  storage } from '../firebase';
+import { v4 as uuidv4 } from 'uuid';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import uuid from 'react-native-uuid';
 
 export const launchImagePicker = async () => { 
   const result = await ImagePicker.launchImageLibraryAsync({
@@ -33,12 +34,16 @@ export const uploadImageAsync = async (uri) => {
     xhr.open("GET", uri, true);
     xhr.send(null);
   });
+  const pathFolder = 'profilePics';
+  const storageRef = ref(storage,`${pathFolder}/${uuid.v4()}`);
+  
+  await uploadBytesResumable(storageRef,blob);
 
-  const fileRef = ref(getStorage(), uuid.v4());
-  const result = await uploadBytes(fileRef, blob);
+  // const result = await uploadBytes(fileRef, blob);
 
+  
   // We're done with the blob, close and release it
   blob.close();
 
-  return await getDownloadURL(fileRef);
+  return await getDownloadURL(storageRef);
 }

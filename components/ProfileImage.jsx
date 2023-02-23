@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import basicUserImage from '../assets/images/basic-user-image.png'
 import colors from '../constants/colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { launchImagePicker } from '../util/imagePickerHelper';
+import { launchImagePicker, uploadImageAsync } from '../util/imagePickerHelper';
 
 const ProfileImage = ({height,width,uri}) => {
   const source = uri ? { uri } : basicUserImage;
@@ -12,14 +12,18 @@ const ProfileImage = ({height,width,uri}) => {
   const pickImageHandler = async () => {
 
     try {
-      const pickImageUri = await launchImagePicker();
+      const pickImageUrl = await launchImagePicker();
       
-      if(!pickImageUri) return;  
+      if(!pickImageUrl) return;  
 
       // uploadImage
-      // uploadImageAsync(pickImageUri);
+      const uploadUrl = uploadImageAsync(pickImageUrl);
+      
+      if(!uploadUrl) {
+        throw new Error('프로필 이미지 업로드 실패')
+      }
       // setImage
-      setImage({ uri: pickImageUri })
+      setImage({ uri: pickImageUrl })
     } catch (error) {
       console.error(error);
     }
