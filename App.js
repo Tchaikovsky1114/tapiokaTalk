@@ -9,7 +9,7 @@ import { store } from './store/store';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // AsyncStorage.clear()
 LogBox.ignoreLogs(['AsyncStorage'])
-
+LogBox.ignoreLogs(['Key "cancelled" in the image picker result is deprecated and will be removed in SDK 48, use "canceled" instead'])
 
 
 

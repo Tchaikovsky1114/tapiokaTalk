@@ -10,25 +10,27 @@ import colors from '../constants/colors'
 import { reducer } from '../util/reducer/formReducer'
 import { validateInput } from '../util/formActions'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ActivityIndicator, Alert, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import SubmitButton from '../components/common/SubmitButton'
-import { updateUser } from '../util/authActions'
+import { updateUser, userLogout } from '../util/authActions'
+import ProfileImage from '../components/ProfileImage'
 
 
 const SettingsScreen = () => {
   
   const appDispatch = useDispatch()
-  const [profileInputValue, setProfileInputValue] = useState({username:'',email:''})
+  const [profileInputValue, setProfileInputValue] = useState({username:'',email:'',me:''})
   const userData = useSelector(state => state.auth.userData);
   const [isLoading,setIsLoading] = useState(false);
+  const [showSaveSuccessMessage,setShowSaveSuccessMessage] = useState('await');
   const [error,setError] = useState('');
 
   const initialState = {
     values : {
       username: userData.name || '',
       email: userData.email || '',
-      me:'',
+      me: userData.me || '',
     },
     // ** validities 프로퍼티의 값들이 undefined여야 하는 이유 **
     // reducer 함수에서 undefined가 아니면 formIsValid가 false이기 때문
@@ -47,6 +49,15 @@ const SettingsScreen = () => {
   }
   const [formState,dispatch] = useReducer(reducer,initialState)
 
+
+
+  const hasChanges = () => {
+    const currentName = formState.values.username;
+    const currentEmail = formState.values.email;
+    const currentMe = formState.values.me;
+    return currentName !== userData.name || currentEmail !== userData.email || currentMe !== userData.me
+  }
+
   const changeInputHandler = useCallback((name, value) => {
     setProfileInputValue((prev) => ({
       ...prev,
@@ -55,11 +66,9 @@ const SettingsScreen = () => {
 
     const result = validateInput(name,value);
     dispatch({name, validationResult: result, value});
-
   },[dispatch]);
 
   const submitEditHandler = useCallback(async () => {  
-
     try {
       setIsLoading(true);
       const updateData = {
@@ -68,7 +77,7 @@ const SettingsScreen = () => {
         username : formState.values.username
       }
       await appDispatch(updateUser(userData.userId,updateData))
-      
+      setShowSaveSuccessMessage('success');
     } catch (error) {
       setError(error.message);
       
@@ -95,13 +104,21 @@ const SettingsScreen = () => {
     setProfileInputValue({
       username: userData.name,
       email:userData.email,
+      me: userData.me
     })
   },[userData])
+
+  useEffect(() => {
+    if(showSaveSuccessMessage === 'await') return;
+    const timer = setTimeout(() => setShowSaveSuccessMessage('await'),2000);
+    return () => clearTimeout(timer);
+  }, [showSaveSuccessMessage])
 
   return (
     <PageContainer style={{alignItems:'center',justifyContent:'center'}}>
       <PageTitle text="Settings" />
       <ScrollView contentContainerStyle={{backgroundColor:'#fff',minHeight:'100%',width:'100%'}} showsVerticalScrollIndicator={false}>
+        <ProfileImage width={120} height={120}/>
       <Input
         label="이름"
         icon="user"
@@ -138,17 +155,24 @@ const SettingsScreen = () => {
         numberOfLines={4}
         height={120}
         multiline={true}
+        value={profileInputValue.me}
       />
+      { showSaveSuccessMessage === 'success' && <Text style={{color:colors.secondary,fontSize:16}}>변경되었습니다.</Text>}
       {
         isLoading
         ? <View style={{marginTop:24}}><ActivityIndicator size="large" color={colors.secondary} /></View>
-        : <SubmitButton
-        buttonText="수정하기"
+        : hasChanges() && <SubmitButton
+        buttonText="저장하기"
         onPress={submitEditHandler}
         style={{ marginTop: 24 }}
         disabled={!formState.formIsValid}
       />
       }
+      <SubmitButton
+        buttonText="로그아웃"
+        onPress={() => appDispatch(userLogout())}
+        style={{marginTop: 24,}}
+      />
       </ScrollView>
     </PageContainer>
     

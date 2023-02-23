@@ -104,6 +104,7 @@ export const updateUser = (userId,updateData) => {
   const savingName = `${updateData.username.substring(0,1)} ${updateData.username.substring(1)}`
   const obj = {
     ...updateData,
+    name: updateData.username,
     savingName
   }
   return async (dispatch) => {
