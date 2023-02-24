@@ -4,7 +4,8 @@ import MainNavigator from './MainNavigator';
 import AuthScreen from '../screens/AuthScreen';
 import { useSelector } from 'react-redux';
 import StartupScreen from '../screens/StartupScreen';
-
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { OverflowMenuProvider } from 'react-navigation-header-buttons'
 
 
 const AppNavigator = () => {
@@ -15,9 +16,15 @@ const AppNavigator = () => {
   
   return (
     <NavigationContainer>
+      <ActionSheetProvider>
+        <OverflowMenuProvider>
+          <>
       { isAuth && <MainNavigator /> }
       { !isAuth && didTryAutoLogin && <AuthScreen />}
       { !isAuth && !didTryAutoLogin && <StartupScreen />}
+          </>
+        </OverflowMenuProvider>
+      </ActionSheetProvider>
     </NavigationContainer>
   );
 };

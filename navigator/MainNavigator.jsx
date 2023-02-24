@@ -3,6 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import TabNavigator from './TabNavigator';
 import ChatSettingsScreen from '../screens/ChatSettingsScreen';
 import ChatScreen from '../screens/ChatScreen';
+import NewChatScreen from '../screens/NewChatScreen';
+import colors from '../constants/colors';
 
 const Stack = createNativeStackNavigator();
 
@@ -12,12 +14,10 @@ const MainNavigator = () => {
         screenOptions={{
           animation: 'slide_from_right',
           presentation: 'card',
-          headerBackTitle: 'Back',
-          headerShadowVisible: false,
-          headerTitle:''  
+          headerShown:false
         }}
       >
-
+      <Stack.Group>
         <Stack.Screen
           name="Home"
           component={TabNavigator}
@@ -36,8 +36,24 @@ const MainNavigator = () => {
             headerTitle: 'Settings',
           }}
         />
-
-      </Stack.Navigator>
+      </Stack.Group>
+      
+      <Stack.Group screenOptions={{
+        animation:'slide_from_bottom',
+        presentation: 'containedModal',
+        headerShown:true,
+        headerTitleStyle:{
+          fontFamily:'black',
+          color:colors.default
+          }
+        }}
+        >
+      <Stack.Screen
+          name="NewChat"
+          component={NewChatScreen}
+        />
+      </Stack.Group>
+    </Stack.Navigator>
   )
 }
 

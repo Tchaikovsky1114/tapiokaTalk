@@ -9,7 +9,7 @@ const Tab = createBottomTabNavigator()
 const TabNavigator = () => {
   return (
     <Tab.Navigator
-      screenOptions={{headerShown:false}}
+      screenOptions={{}}
     >
       <Tab.Screen name="ChatList" component={ChatListScreen} options={{
         tabBarLabel: 'Chats',
@@ -21,7 +21,9 @@ const TabNavigator = () => {
         tabBarLabel: 'Settings',
         tabBarIcon: ({focused}) => {
           return <SimpleLineIcons name="settings" size={24} color={focused ? '#2d63e2' : "black"} />
-        }
+        },
+        headerTitle:'',
+        headerShadowVisible:false,
       }} />
     </Tab.Navigator>
   )

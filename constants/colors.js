@@ -3,5 +3,8 @@ export default {
   active: '#8a163e',
   frame: '#f5cece',
   grey: '#c7c7c7',
-  secondary:'#2d63e2'
+  deepGrey: '#555555',
+  secondary:'#2d63e2',
+  emphasis: '#e22d2d',
+
 }
