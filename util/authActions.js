@@ -1,7 +1,7 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth, database } from '../firebase';
 import { child, ref, set, update } from 'firebase/database'
-import { authenticate,logout, updateUserData } from '../store/authSlice';
+import { authenticate,logout, updateUserData, updateUserProfileImage } from '../store/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUserData } from './userActions';
 
@@ -119,6 +119,15 @@ export const updateUser = (userId,updateData) => {
   }
 }
 
+export const updateProfileImage = (userId, profileImage) => {
+  return async (dispatch) => {
+    const dbRef = ref(database);
+    const userRef = child(dbRef,`/users/${userId}`);
+    await update(userRef, profileImage );
+    dispatch(updateUserProfileImage(profileImage));
+
+  }
+}
 
 const saveDataToStorage = (token, userId, expiryDate) => {
   AsyncStorage.setItem("userData", JSON.stringify({ token, userId, expiryDate: expiryDate.toISOString() }))

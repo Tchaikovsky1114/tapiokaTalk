@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 
 import {  storage } from '../firebase';
-import { v4 as uuidv4 } from 'uuid';
+
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import uuid from 'react-native-uuid';
 

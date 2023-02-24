@@ -113,12 +113,12 @@ const SettingsScreen = () => {
     const timer = setTimeout(() => setShowSaveSuccessMessage('await'),2000);
     return () => clearTimeout(timer);
   }, [showSaveSuccessMessage])
-
+  console.log(userData);
   return (
     <PageContainer style={{alignItems:'center',justifyContent:'center'}}>
       <PageTitle text="Settings" />
       <ScrollView contentContainerStyle={{backgroundColor:'#fff',minHeight:'100%',width:'100%'}} showsVerticalScrollIndicator={false}>
-        <ProfileImage width={120} height={120}/>
+        <ProfileImage width={120} height={120} userId={userData.userId} uri={userData.profileImage} />
       <Input
         label="이름"
         icon="user"

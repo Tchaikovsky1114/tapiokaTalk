@@ -28,10 +28,15 @@ const authSlice = createSlice({
       state.userData.name = payload.username
       state.userData.me = payload.me
       state.userData.email = payload.email
+    },
+    updateUserProfileImage: (state,action) => {
+      const { payload } = action;
+      state.userData.profileImage = payload.profileImage
     }
   }
 })
 
+export const updateUserProfileImage = authSlice.actions.updateUserProfileImage;
 export const authenticate = authSlice.actions.authenticate;
 export const updateUserData = authSlice.actions.updateUserData;
 export const setDidTryAutoLogin = authSlice.actions.setDidTryAutoLogin;
