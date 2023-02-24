@@ -3,11 +3,14 @@ import React, { useEffect } from 'react'
 import { HeaderButtons,Item } from 'react-navigation-header-buttons'
 import CustomHeaderButton from '../components/common/CustomHeaderButton'
 import colors from '../constants/colors'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
 
 const ChatListScreen = () => {
   const navigation = useNavigation()
-  
+  const { params } = useRoute();
+  const userData = useSelector(state => state.auth.userData);
+
   useEffect(() => {
     navigation.setOptions({
       headerTitleAlign: 'center',
@@ -24,6 +27,13 @@ const ChatListScreen = () => {
       }
     })
   },[])
+
+  useEffect(() => {
+    if(!params?.selectedUserId) return;
+    const selectedUsers = [params.selectedUserId,userData.userId]
+    navigation.navigate("Chat", { users: selectedUsers })
+  }, [params])
+
   return (
     <View style={styles.container}>
       <Text style={{fontFamily:'black',lineHeight:18}}>Tapioka Talk</Text>

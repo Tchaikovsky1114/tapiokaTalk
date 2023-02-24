@@ -10,23 +10,30 @@ import {
   KeyboardAvoidingView,
   useWindowDimensions,
 } from 'react-native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import backgroundImage from '../assets/images/tapioca-pearls.jpg';
 import { Octicons } from '@expo/vector-icons';
 import colors from '../constants/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const ChatScreen = () => {
   const [inputMessage, setInputMessage] = useState('');
   const { height } = useWindowDimensions();
-
+  const navigation = useNavigation();
   const sendMessage = useCallback(() => {
     setInputMessage("");
   },[inputMessage])
   
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown:true,
+    })
+  },[])
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1,paddingBottom:24,backgroundColor:'#fff' }}>
       <ImageBackground
         style={{ flex: 14 }}
         source={backgroundImage}
@@ -43,6 +50,8 @@ const ChatScreen = () => {
           alignItems: 'center',
           paddingVertical: 8,
           paddingHorizontal: 12,
+          backgroundColor:'#fff',
+          
         }}
       >
         {!inputMessage && (

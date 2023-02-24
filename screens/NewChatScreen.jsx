@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet,TextInput, Platform } from 'react-native'
+import { View, Text, StyleSheet,TextInput, Platform, ActivityIndicator, FlatList, Image, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { HeaderButtons,Item } from 'react-navigation-header-buttons'
 import CustomHeaderButton from '../components/common/CustomHeaderButton'
@@ -9,6 +9,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import commonStyles from '../components/common/commonStyles'
 import { FontAwesome5 } from '@expo/vector-icons';
 import { searchUsers } from '../util/userActions'
+import { useSelector } from 'react-redux'
 const NewChatScreen = () => {
   const navigation = useNavigation();
 
@@ -16,7 +17,14 @@ const NewChatScreen = () => {
   const [users,setUsers] = useState();
   const [noResultFound,setNoResultFound] = useState(false);
   const [searchTerm,setSearchTerm] = useState('');
+  const userData = useSelector(state => state.auth.userData);
 
+  const pressUserHandler = (userId) => {
+    navigation.navigate("ChatList",{
+      selectedUserId: userId
+    })
+  }
+  
   useEffect(() => {
     navigation.setOptions({
       headerTitleAlign: 'center',
@@ -34,11 +42,7 @@ const NewChatScreen = () => {
       }
     })
   },[])
-  const [isItemChecked,setIsItemChecked] = useState(false)
 
-  useEffect(() => {
-
-  },[])
   useEffect(() => {
     const delaySearch = setTimeout(async () => {
       
@@ -50,14 +54,21 @@ const NewChatScreen = () => {
       
       setIsLoading(true);
 
-      const usersResult = await searchUsers(searchTerm);    
-
+      const usersResult = await searchUsers(searchTerm);
+      delete usersResult[userData.userId];
+      if(Object.keys(usersResult).length === 0) {
+        setNoResultFound(true);
+      }else{
+        setNoResultFound(false)
+      }
+      setUsers(usersResult);
       setIsLoading(false);
     },500);
 
     return () => clearTimeout(delaySearch);
     
   },[searchTerm])
+  // console.log(users);
   return (
     <PageContainer>
       <View style={{flexDirection:'row',alignItems:'center',backgroundColor:colors.frame,width:'100%',marginTop:16,minHeight:40,borderRadius:8,paddingHorizontal:4}}>
@@ -72,6 +83,39 @@ const NewChatScreen = () => {
           placeholderTextColor={colors.active}
           />
       </View>
+        {
+          isLoading && (
+            <View style={commonStyles.center}>
+              <ActivityIndicator size="large" color={colors.default} />
+            </View>
+          )
+        }
+        { !isLoading && !noResultFound && users &&
+          <FlatList
+            data={Object.values(users)}
+            contentContainerStyle={{width:'100%'}}
+            renderItem={({item}) => {
+              return (
+              <TouchableOpacity
+              onPress={() =>pressUserHandler(item.userId)}
+              style={{flexDirection:'row',justifyContent:'center',alignItems:'center',paddingVertical:4,marginTop:8,borderWidth:1,borderColor:colors.frame,paddingHorizontal:8,borderRadius:8,minHeight:96,maxHeight:120}}>
+                <Image source={{uri: item.profileImage }} style={{width:56,height:56}} borderRadius={9999} />
+                <View style={{width:32}}/>
+                <View style={{flex:1,alignItems:'flex-start',justifyContent:'center',marginTop:16}}>
+                  <View style={{flex:3}}>
+                    <Text style={{fontFamily:'black',fontSize:16,lineHeight:24,color:colors.default}}>{item.name}</Text>
+                  </View>
+                  <View style={{flex:5}}>
+                    <Text style={{fontFamily:'Medium',color:colors.grey,lineHeight:18}}>{item.me}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              )
+            }}
+            keyExtractor={(item) => item.userId}
+
+          />
+        }
         {
             !isLoading && !users && (
               <View style={commonStyles.center}>

@@ -24,7 +24,7 @@ export const searchUsers = async (queryText) => {
 
     //endAt의 uf9ff 유니코드는 uf8ff까지 찾아주는 역할.
     const queryRef = query(userRef, orderByChild('name'), startAt(searchTerm), endAt(searchTerm + "\uf9ff"));
-    console.log(queryRef);
+    
     const snapshot = await get(queryRef);
     
     if(snapshot.exists()){
