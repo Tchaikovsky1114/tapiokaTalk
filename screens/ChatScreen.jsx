@@ -17,20 +17,43 @@ import { Octicons } from '@expo/vector-icons';
 import colors from '../constants/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import PageContainer from '../components/common/PageContainer';
+import Bubble from '../components/Bubble';
 
-const ChatScreen = () => {
-  const [inputMessage, setInputMessage] = useState('');
+const ChatScreen = ({route}) => {
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
+  const userList = useSelector(state => state.user.storedUsers);
+  const userData = useSelector(state => state.auth.userData);
+  const chatData = route?.params.users.newChatData;
+  const [inputMessage, setInputMessage] = useState('');
+  const [chatUsers,setChatUsers] = useState([]);
+  const [chatId, setChatId] = useState(route?.params?.chatId)
+  
   const sendMessage = useCallback(() => {
     setInputMessage("");
   },[inputMessage])
+
+  const getChatTitleFromName = () => {
+    const otherUserId = chatUsers.find((uid) => uid !== userData.userId);
+    const otherUserData = userList[otherUserId]
+    
+    return otherUserData && otherUserData.name;
+  }
+  
   
   useEffect(() => {
+    setChatUsers(chatData.users);
     navigation.setOptions({
       headerShown:true,
+      headerTitle: getChatTitleFromName(),
+      headerShadowVisible: false,
+      headerTitleAlign:'center'
     })
-  },[])
+  },[chatUsers])
+
+  
 
   return (
     <SafeAreaView style={{ flex: 1,paddingBottom:24,backgroundColor:'#fff' }}>
@@ -38,7 +61,11 @@ const ChatScreen = () => {
         style={{ flex: 14 }}
         source={backgroundImage}
         resizeMode="stretch"
-      ></ImageBackground>
+      >
+        <PageContainer style={{backgroundColor:'transparent'}}>
+          {!chatId && <Bubble text="Hello world!" type="system" />}
+        </PageContainer>
+      </ImageBackground>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}

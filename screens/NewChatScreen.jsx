@@ -9,10 +9,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import commonStyles from '../components/common/commonStyles'
 import { FontAwesome5 } from '@expo/vector-icons';
 import { searchUsers } from '../util/userActions'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { setStoredUsers } from '../store/userSlice'
 const NewChatScreen = () => {
   const navigation = useNavigation();
-
+  const dispatch = useDispatch();
   const [isLoading,setIsLoading] = useState(false);
   const [users,setUsers] = useState();
   const [noResultFound,setNoResultFound] = useState(false);
@@ -51,7 +52,6 @@ const NewChatScreen = () => {
         setNoResultFound(false);
         return;
       }
-      
       setIsLoading(true);
 
       const usersResult = await searchUsers(searchTerm);
@@ -59,7 +59,8 @@ const NewChatScreen = () => {
       if(Object.keys(usersResult).length === 0) {
         setNoResultFound(true);
       }else{
-        setNoResultFound(false)
+        setNoResultFound(false);
+        dispatch(setStoredUsers({ newData: usersResult }))
       }
       setUsers(usersResult);
       setIsLoading(false);
