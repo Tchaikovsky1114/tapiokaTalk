@@ -20,6 +20,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import PageContainer from '../components/common/PageContainer';
 import Bubble from '../components/Bubble';
+import { createChat } from '../util/chatActions';
 
 const ChatScreen = ({route}) => {
   const { height } = useWindowDimensions();
@@ -31,9 +32,23 @@ const ChatScreen = ({route}) => {
   const [chatUsers,setChatUsers] = useState([]);
   const [chatId, setChatId] = useState(route?.params?.chatId)
   
-  const sendMessage = useCallback(() => {
+  const sendMessage = useCallback(async () => {
+
+
+    try {
+    let id = chatId;
+    if(!id) {
+      // No chat Id. Create the chat
+      // newChatData: 친구 목록 검색 후 친구를 클릭한 뒤 받아오는 친구와 나의 id가 담김.
+      id = await createChat(userData.userId,route.params.users.newChatData);
+      setChatId(id);
+    }  
+    } catch (error) {
+      console.error(error);
+    }
+
     setInputMessage("");
-  },[inputMessage])
+  },[inputMessage,chatId])
 
   const getChatTitleFromName = () => {
     const otherUserId = chatUsers.find((uid) => uid !== userData.userId);

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Platform, FlatList } from 'react-native'
 import React, { useEffect } from 'react'
 import { HeaderButtons,Item } from 'react-navigation-header-buttons'
 import CustomHeaderButton from '../components/common/CustomHeaderButton'
@@ -10,7 +10,8 @@ const ChatListScreen = () => {
   const navigation = useNavigation()
   const { params } = useRoute();
   const userData = useSelector(state => state.auth.userData);
-
+  const userChats = useSelector(state => {const chatsData = state.chat.chatsData; return Object.values(chatsData)});
+  
   useEffect(() => {
     navigation.setOptions({
       headerTitleAlign: 'center',
@@ -38,12 +39,15 @@ const ChatListScreen = () => {
   }, [params])
 
   return (
-    <View style={styles.container}>
-      <Text style={{fontFamily:'black',lineHeight:18}}>Tapioka Talk</Text>
-      <TouchableOpacity style={{marginTop:Platform.OS === 'android' ? -16 : 0 }} onPress={() => navigation.navigate('Chat')}>
-        <Text style={{fontFamily:'black',color:'#5c112b',fontSize:24}}>Go to Chat</Text>
-      </TouchableOpacity>
-    </View>
+    <FlatList
+    data={userChats}
+    renderItem={({item}) => {
+      // userChats를 돌면서 users배열에서 내 id와 다른 상대방 id extract
+      const otherUserId = item.users.find(uid => uid !== userData.userId);
+
+      return <Text>{otherUserId}</Text>
+    }}
+    />
   )
 }
 

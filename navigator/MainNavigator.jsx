@@ -1,59 +1,86 @@
-import React from 'react'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import TabNavigator from './TabNavigator';
-import ChatSettingsScreen from '../screens/ChatSettingsScreen';
-import ChatScreen from '../screens/ChatScreen';
-import NewChatScreen from '../screens/NewChatScreen';
+import { child, get, off, onValue, ref } from 'firebase/database';
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import colors from '../constants/colors';
+import { database } from '../firebase';
+import { setChatsData } from '../store/chatSlice';
+import { setStoredUsers } from '../store/userSlice';
 
-const Stack = createNativeStackNavigator();
+import StackNavigator from './StackNavigator';
 
 const MainNavigator = () => {
-  return (
-    <Stack.Navigator
-        screenOptions={{
-          animation: 'slide_from_right',
-          presentation: 'card',
-          headerShown:false
-        }}
-      >
-      <Stack.Group>
-        <Stack.Screen
-          name="Home"
-          component={TabNavigator}
-        />
-        <Stack.Screen
-          name="Chat"
-          component={ChatScreen}
-          options={{
-            headerTitle: '',
-          }}
-        />
-        <Stack.Screen
-          name="ChatSettings"
-          component={ChatSettingsScreen}
-          options={{
-            headerTitle: 'Settings',
-          }}
-        />
-      </Stack.Group>
-      
-      <Stack.Group screenOptions={{
-        animation:'slide_from_bottom',
-        presentation: 'containedModal',
-        headerShown:true,
-        headerTitleStyle:{
-          fontFamily:'black',
-          color:colors.default
+  const dispatch = useDispatch();
+  const userData = useSelector(state => state.auth.userData);
+  const storedUsers = useSelector(state => state.user.storedUsers);
+  const [isLoading, setIsLoading] = useState(true); 
+
+
+  useEffect(() => {
+    console.log("subscribing to firebase listener");
+
+    const dbRef = ref(database)
+    const userChatsRef = child(dbRef, `userChats/${userData.userId}`);
+    const refs = [userChatsRef];
+    // 값이 변경될 때마다 onValue가 실행됨.
+    onValue(userChatsRef, (querySnapshot) => {
+      const chatIdsData = querySnapshot.val(); // [{firebasekey: chatId},{firebasekey: chatId}]
+      const chatIds = Object.values(chatIdsData); // [chatId,chatId]
+
+      const chatsData = {};
+      let chatsFoundCount = 0;
+
+      for (let i = 0; i < chatIds.length; i++) {
+        const chatId = chatIds[i]; // chatId
+        const chatRef = child(dbRef, `chats/${chatId}`);
+        refs.push(chatRef);
+
+        onValue(chatRef, (chatSnapshot) => {
+          chatsFoundCount++;
+          const data = chatSnapshot.val();
+
+          if(data) {
+            data.key = chatSnapshot.key;
+            data.users.forEach(async (userId) => {
+              if(storedUsers[userId]) return;
+
+              const userRef = child(dbRef, `users/${userId}`);
+
+              await get(userRef, (userSnapshot) => {
+                const userSnapshotData = userSnapshot.val();
+                dispatch(setStoredUsers({newUsers: userSnapshotData}));
+              })
+            })
+            chatsData[chatSnapshot.key] = data;
           }
-        }}
-        >
-      <Stack.Screen
-          name="NewChat"
-          component={NewChatScreen}
-        />
-      </Stack.Group>
-    </Stack.Navigator>
+
+          if(chatsFoundCount >= chatIds.length) {
+            dispatch(setChatsData({ chatsData }));
+            setIsLoading(false);
+          }
+        })
+
+        if(chatsFoundCount === 0) {
+          setIsLoading(false);
+        }
+      }
+
+      
+    })
+    return () => {
+      console.log("Unsubscribing to firebase listener");
+      refs.forEach(ref => off(ref));
+    }
+  }, [])
+
+  if (isLoading) {
+    <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+      <ActivityIndicator size="large" color={colors.active} />
+    </View>
+  }
+
+  return (
+      <StackNavigator />
   )
 }
 
