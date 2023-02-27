@@ -46,10 +46,12 @@ const MainNavigator = () => {
 
               const userRef = child(dbRef, `users/${userId}`);
 
-              await get(userRef, (userSnapshot) => {
-                const userSnapshotData = userSnapshot.val();
-                dispatch(setStoredUsers({newUsers: userSnapshotData}));
-              })
+              await get(userRef).then((userSnapshot) => {
+                  const userSnapshotData = userSnapshot.val();
+                  dispatch(setStoredUsers({newData: userSnapshotData}));
+                });
+
+              refs.push(userRef);
             })
             chatsData[chatSnapshot.key] = data;
           }

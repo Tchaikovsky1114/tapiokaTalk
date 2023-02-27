@@ -10,8 +10,11 @@ const ChatListScreen = () => {
   const navigation = useNavigation()
   const { params } = useRoute();
   const userData = useSelector(state => state.auth.userData);
-  const userChats = useSelector(state => {const chatsData = state.chat.chatsData; return Object.values(chatsData)});
-  
+  const userChats = useSelector(state => {
+    const chatsData = state.chat.chatsData;
+    return Object.values(chatsData);
+  });
+  console.log(userChats);
   useEffect(() => {
     navigation.setOptions({
       headerTitleAlign: 'center',
@@ -39,6 +42,8 @@ const ChatListScreen = () => {
   }, [params])
 
   return (
+    <>
+
     <FlatList
     data={userChats}
     renderItem={({item}) => {
@@ -48,6 +53,7 @@ const ChatListScreen = () => {
       return <Text>{otherUserId}</Text>
     }}
     />
+    </>
   )
 }
 
