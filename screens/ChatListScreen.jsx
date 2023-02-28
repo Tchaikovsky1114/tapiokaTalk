@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Platform, FlatList } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Platform, FlatList, Image } from 'react-native'
 import React, { useEffect } from 'react'
 import { HeaderButtons,Item } from 'react-navigation-header-buttons'
 import CustomHeaderButton from '../components/common/CustomHeaderButton'
@@ -10,11 +10,17 @@ const ChatListScreen = () => {
   const navigation = useNavigation()
   const { params } = useRoute();
   const userData = useSelector(state => state.auth.userData);
+  
+  const storedUsers = useSelector(state => state.user.storedUsers);
+  
   const userChats = useSelector(state => {
     const chatsData = state.chat.chatsData;
-    return Object.values(chatsData);
+    const sortUpdatedAt = Object.values(chatsData).sort((a,b) => {
+      return new Date(b.updatedAt) - new Date(a.updatedAt);
+    })
+    return sortUpdatedAt
   });
-  console.log(userChats);
+  
   useEffect(() => {
     navigation.setOptions({
       headerTitleAlign: 'center',
@@ -41,19 +47,35 @@ const ChatListScreen = () => {
     navigation.navigate("Chat", { users: navigationProps })
   }, [params])
 
+  // 로그인 시 기존의 채팅방을 가져오려면 chatSlice의 chatsData를 가져와야함.
+  // useEffect(() => {
+  //  getChatRooms(userData.userId)
+  // },[])
   return (
-    <>
-
     <FlatList
+    contentContainerStyle={{minHeight:'100%',backgroundColor:'#fff'}}
     data={userChats}
     renderItem={({item}) => {
-      // userChats를 돌면서 users배열에서 내 id와 다른 상대방 id extract
+      
+      const chatId = item.key;
       const otherUserId = item.users.find(uid => uid !== userData.userId);
-
-      return <Text>{otherUserId}</Text>
+      const otherUser = storedUsers[otherUserId];
+      if(!otherUser) return;
+      return (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Chat',{ chatId })}
+          style={{flexDirection:'row',justifyContent:'flex-start',alignItems:'center',padding:24,backgroundColor:'#fff',borderBottomWidth:1,borderBottomColor:colors.grey}}
+          >
+          <Image source={{uri:otherUser.profileImage}} style={{width:40, height:40,marginRight:8}} borderRadius={40} />
+          <View>
+            <Text style={{fontSize:16,fontFamily:'bold'}}>{otherUser.name}님과의 대화</Text>
+            <Text style={{fontSize:12,color:colors.grey}}>Will place Some message here..</Text>
+          </View>
+        </TouchableOpacity>
+      )
     }}
     />
-    </>
+
   )
 }
 

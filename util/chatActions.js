@@ -23,3 +23,22 @@ export const createChat = async (loggedInUserId, chatData) => {
     await push(child(dbRef, `userChats/${userId}`), newChat.key);
   }
 }
+
+export const sendTextMessage = async (chatId, senderId, messageText) => {
+
+  try {
+  const dbRef = ref(database);
+  const messagesRef = child(dbRef, `messages/${chatId}`);
+
+  const messageData = { 
+    sentBy : senderId,
+    sentAt : new Date().toISOString(),
+    text: messageText,
+  }
+
+  await push(messagesRef, messageData);
+
+  } catch (error) {
+     
+  }
+}

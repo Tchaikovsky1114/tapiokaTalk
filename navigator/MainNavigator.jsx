@@ -15,7 +15,6 @@ const MainNavigator = () => {
   const storedUsers = useSelector(state => state.user.storedUsers);
   const [isLoading, setIsLoading] = useState(true); 
 
-
   useEffect(() => {
     console.log("subscribing to firebase listener");
 
@@ -24,7 +23,7 @@ const MainNavigator = () => {
     const refs = [userChatsRef];
     // 값이 변경될 때마다 onValue가 실행됨.
     onValue(userChatsRef, (querySnapshot) => {
-      const chatIdsData = querySnapshot.val(); // [{firebasekey: chatId},{firebasekey: chatId}]
+      const chatIdsData = querySnapshot.val() || {}; // [{firebasekey: chatId},{firebasekey: chatId}]
       const chatIds = Object.values(chatIdsData); // [chatId,chatId]
 
       const chatsData = {};
@@ -38,19 +37,21 @@ const MainNavigator = () => {
         onValue(chatRef, (chatSnapshot) => {
           chatsFoundCount++;
           const data = chatSnapshot.val();
-
+          
           if(data) {
             data.key = chatSnapshot.key;
-            data.users.forEach(async (userId) => {
+            
+            data.users.forEach((userId) => {
               if(storedUsers[userId]) return;
-
+              
               const userRef = child(dbRef, `users/${userId}`);
-
-              await get(userRef).then((userSnapshot) => {
+              
+               get(userRef)
+               .then((userSnapshot) => {
                   const userSnapshotData = userSnapshot.val();
-                  dispatch(setStoredUsers({newData: userSnapshotData}));
+                  dispatch(setStoredUsers({ newData: { userSnapshotData } }));
                 });
-
+                
               refs.push(userRef);
             })
             chatsData[chatSnapshot.key] = data;

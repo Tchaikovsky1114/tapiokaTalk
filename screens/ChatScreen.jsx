@@ -1,10 +1,7 @@
 import {
   ImageBackground,
-  StyleSheet,
-  Text,
   TouchableOpacity,
   TextInput,
-  View,
   SafeAreaView,
   Platform,
   KeyboardAvoidingView,
@@ -20,31 +17,33 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import PageContainer from '../components/common/PageContainer';
 import Bubble from '../components/Bubble';
-import { createChat } from '../util/chatActions';
+import { createChat, sendTextMessage } from '../util/chatActions';
 
 const ChatScreen = ({route}) => {
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
-  const userList = useSelector(state => state.user.storedUsers);
+  const storedUsers = useSelector(state => state.user.storedUsers);
   const userData = useSelector(state => state.auth.userData);
-  const chatData = route?.params.users.newChatData;
+  const storedChats = useSelector(state => state.chat.chatsData);
   const [inputMessage, setInputMessage] = useState('');
   const [chatUsers,setChatUsers] = useState([]);
   const [chatId, setChatId] = useState(route?.params?.chatId)
+
+  const chatData = (chatId && storedChats[chatId]) || route?.params.users.newChatData;
   
   const sendMessage = useCallback(async () => {
 
-
     try {
-    let id = chatId;
-    if(!id) {
-      // No chat Id. Create the chat
-      // newChatData: 친구 목록 검색 후 친구를 클릭한 뒤 받아오는 친구와 나의 id가 담김.
-      id = await createChat(userData.userId,route.params.users.newChatData);
-      setChatId(id);
-    }  
-    } catch (error) {
-      console.error(error);
+      let id = chatId;
+        if(!id) {
+        // No chat Id. Create the chat
+        // newChatData: 친구 목록 검색 후 친구를 클릭한 뒤 받아오는 친구와 나의 id가 담김.
+          id = await createChat(userData.userId,route.params.users.newChatData);
+          setChatId(id);
+        }
+        await sendTextMessage(chatId,userData.userId,inputMessage)
+      } catch (error) {
+        console.error(error);
     }
 
     setInputMessage("");
@@ -52,11 +51,9 @@ const ChatScreen = ({route}) => {
 
   const getChatTitleFromName = () => {
     const otherUserId = chatUsers.find((uid) => uid !== userData.userId);
-    const otherUserData = userList[otherUserId]
-    
+    const otherUserData = storedUsers[otherUserId]
     return otherUserData && otherUserData.name;
   }
-  
   
   useEffect(() => {
     setChatUsers(chatData.users);
@@ -68,6 +65,11 @@ const ChatScreen = ({route}) => {
     })
   },[chatUsers])
 
+  // useEffect(() => {
+  //   if(!chatId) return ;
+    
+  //   // await createChat(userData.userId,route.params.users.newChatData)
+  // },[route.params])
   
 
   return (
@@ -159,5 +161,3 @@ const ChatScreen = ({route}) => {
 };
 
 export default ChatScreen;
-
-const styles = StyleSheet.create({});

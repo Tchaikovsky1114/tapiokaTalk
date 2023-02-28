@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet,TextInput, Platform, ActivityIndicator, FlatList, Image, TouchableOpacity } from 'react-native'
+import { View, Text,TextInput, Platform, ActivityIndicator, FlatList, Image, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { HeaderButtons,Item } from 'react-navigation-header-buttons'
 import CustomHeaderButton from '../components/common/CustomHeaderButton'
@@ -11,6 +11,9 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { searchUsers } from '../util/userActions'
 import { useDispatch, useSelector } from 'react-redux'
 import { setStoredUsers } from '../store/userSlice'
+
+
+
 const NewChatScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
