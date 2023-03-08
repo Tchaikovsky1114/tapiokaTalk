@@ -56,7 +56,7 @@ const ChatListScreen = () => {
     contentContainerStyle={{minHeight:'100%',backgroundColor:'#fff'}}
     data={userChats}
     renderItem={({item}) => {
-      
+
       const chatId = item.key;
       const otherUserId = item.users.find(uid => uid !== userData.userId);
       const otherUser = storedUsers[otherUserId];
@@ -69,7 +69,7 @@ const ChatListScreen = () => {
           <Image source={{uri:otherUser.profileImage}} style={{width:40, height:40,marginRight:8}} borderRadius={40} />
           <View>
             <Text style={{fontSize:16,fontFamily:'bold'}}>{otherUser.name}님과의 대화</Text>
-            <Text style={{fontSize:12,color:colors.grey}}>Will place Some message here..</Text>
+            <Text style={{fontSize:12,color:colors.grey}}>{item.latestMessageText || 'new chat'}</Text>
           </View>
         </TouchableOpacity>
       )

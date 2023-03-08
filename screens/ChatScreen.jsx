@@ -25,15 +25,18 @@ const ChatScreen = ({route}) => {
   const storedUsers = useSelector(state => state.user.storedUsers);
   const userData = useSelector(state => state.auth.userData);
   const storedChats = useSelector(state => state.chat.chatsData);
+  const chatMessages = useSelector(state => state.message.messagesData)
+
   const [inputMessage, setInputMessage] = useState('');
   const [chatUsers,setChatUsers] = useState([]);
   const [chatId, setChatId] = useState(route?.params?.chatId)
+  const [errorBannerText, setErrorBannerText] = useState(''); 
 
   const chatData = (chatId && storedChats[chatId]) || route?.params.users.newChatData;
-  
+  // console.log(chatMessages);
   const sendMessage = useCallback(async () => {
-
     try {
+      
       let id = chatId;
         if(!id) {
         // No chat Id. Create the chat
@@ -41,9 +44,14 @@ const ChatScreen = ({route}) => {
           id = await createChat(userData.userId,route.params.users.newChatData);
           setChatId(id);
         }
-        await sendTextMessage(chatId,userData.userId,inputMessage)
+        await sendTextMessage(chatId,userData.userId,inputMessage);
+        setInputMessage('');
       } catch (error) {
         console.error(error);
+        setErrorBannerText('메세지 전송에 실패하였습니다.');
+        setTimeout(() => {
+          setErrorBannerText('')
+        }, 3000)
     }
 
     setInputMessage("");
@@ -72,6 +80,7 @@ const ChatScreen = ({route}) => {
   // },[route.params])
   
 
+
   return (
     <SafeAreaView style={{ flex: 1,paddingBottom:24,backgroundColor:'#fff' }}>
       <ImageBackground
@@ -81,6 +90,7 @@ const ChatScreen = ({route}) => {
       >
         <PageContainer style={{backgroundColor:'transparent'}}>
           {!chatId && <Bubble text="Hello world!" type="system" />}
+          {errorBannerText && <Bubble text={errorBannerText} type="error" />}
         </PageContainer>
       </ImageBackground>
 

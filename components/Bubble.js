@@ -13,7 +13,11 @@ const Bubble = ({text,type}) => {
       bubbleStyle.backgroundColor = '#fef5c3'
       bubbleStyle.alignItems = 'center';
       break;
-  
+    case "error":
+      textStyle.color = colors.emphasis;
+      bubbleStyle.backgroundColor = '#fff';
+      bubbleStyle.borderWidth = 1;
+      bubbleStyle.borderColor = '#f41'
     default:
       break;
   }

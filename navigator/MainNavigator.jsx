@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import colors from '../constants/colors';
 import { database } from '../firebase';
 import { setChatsData } from '../store/chatSlice';
+import { setChatMessages } from '../store/messageSlice';
 import { setStoredUsers } from '../store/userSlice';
 
 import StackNavigator from './StackNavigator';
@@ -61,6 +62,14 @@ const MainNavigator = () => {
             dispatch(setChatsData({ chatsData }));
             setIsLoading(false);
           }
+        })
+
+        const messagesRef = child(dbRef, `messages/${chatId}`);
+        refs.push(messagesRef);
+
+        onValue(messagesRef, messagegeSnapshot => {
+          const messagesData = messagegeSnapshot.val();
+          dispatch(setChatMessages({ chatId, messagesData }))
         })
 
         if(chatsFoundCount === 0) {

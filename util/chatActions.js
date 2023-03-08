@@ -1,4 +1,4 @@
-import { child, push, ref } from "firebase/database";
+import { child, push, ref, update } from "firebase/database";
 import { database } from "../firebase";
 
 export const createChat = async (loggedInUserId, chatData) => {
@@ -21,6 +21,7 @@ export const createChat = async (loggedInUserId, chatData) => {
     const userId = chatUsers[i];
     // 내가 들어가 있는 채팅방
     await push(child(dbRef, `userChats/${userId}`), newChat.key);
+    // await push(child(dbRef, `chats/${userId}`), newChat.key);
   }
 }
 
@@ -29,6 +30,7 @@ export const sendTextMessage = async (chatId, senderId, messageText) => {
   try {
   const dbRef = ref(database);
   const messagesRef = child(dbRef, `messages/${chatId}`);
+  const chatRef = child(dbRef, `chats/${chatId}`);
 
   const messageData = { 
     sentBy : senderId,
@@ -37,6 +39,13 @@ export const sendTextMessage = async (chatId, senderId, messageText) => {
   }
 
   await push(messagesRef, messageData);
+
+  await update(chatRef, {
+    updatedBy: senderId,
+    updatedAt: new Date().toISOString(),
+    latestMessageText: messageText,
+  })
+  
 
   } catch (error) {
      
