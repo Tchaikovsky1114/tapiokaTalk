@@ -6,6 +6,7 @@ import AppNavigator from './navigator/AppNavigator';
 import { LogBox } from 'react-native';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
+import { MenuProvider } from 'react-native-popup-menu';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // AsyncStorage.clear()
 LogBox.ignoreLogs(['AsyncStorage'])
@@ -54,7 +55,9 @@ export default function App() {
   return (
     <Provider store={store}>
       <SafeAreaProvider onLayout={onLayout} >
-        <AppNavigator />
+        <MenuProvider>
+          <AppNavigator />
+        </MenuProvider>
       </SafeAreaProvider>
     </Provider>
   );

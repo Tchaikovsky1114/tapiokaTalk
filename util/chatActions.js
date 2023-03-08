@@ -23,6 +23,8 @@ export const createChat = async (loggedInUserId, chatData) => {
     await push(child(dbRef, `userChats/${userId}`), newChat.key);
     // await push(child(dbRef, `chats/${userId}`), newChat.key);
   }
+
+  return newChat.key;
 }
 
 export const sendTextMessage = async (chatId, senderId, messageText) => {

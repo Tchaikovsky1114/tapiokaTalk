@@ -15,10 +15,10 @@ const MainNavigator = () => {
   const userData = useSelector(state => state.auth.userData);
   const storedUsers = useSelector(state => state.user.storedUsers);
   const [isLoading, setIsLoading] = useState(true); 
-
+  
   useEffect(() => {
     console.log("subscribing to firebase listener");
-
+    if(!userData) return;
     const dbRef = ref(database)
     const userChatsRef = child(dbRef, `userChats/${userData.userId}`);
     const refs = [userChatsRef];

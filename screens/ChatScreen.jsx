@@ -32,6 +32,7 @@ const ChatScreen = ({route}) => {
   const storedUsers = useSelector(state => state.user.storedUsers);
   const userData = useSelector(state => state.auth.userData);
   const storedChats = useSelector(state => state.chat.chatsData);
+  
   const chatMessages = useSelector(state => {
     if(!chatId) return;
     const chatMessagesData = state.message.messagesData[chatId];
@@ -49,8 +50,8 @@ const ChatScreen = ({route}) => {
 
 
 
-  const chatData = (chatId && storedChats[chatId]) || route?.params.users.newChatData;
-  // console.log(chatMessages);
+  const chatData = (chatId && storedChats[chatId]) || route?.params.newChatData;
+  console.log(chatData);
   const sendMessage = useCallback(async () => {
     try {
       
@@ -58,7 +59,7 @@ const ChatScreen = ({route}) => {
         if(!id) {
         // No chat Id. Create the chat
         // newChatData: 친구 목록 검색 후 친구를 클릭한 뒤 받아오는 친구와 나의 id가 담김.
-          id = await createChat(userData.userId,route.params.users.newChatData);
+          id = await createChat(userData.userId,route?.params.newChatData);
           setChatId(id);
         }
         await sendTextMessage(chatId,userData.userId,inputMessage);
@@ -79,8 +80,8 @@ const ChatScreen = ({route}) => {
     const otherUserData = storedUsers[otherUserId]
     return otherUserData && otherUserData.name;
   }
-  
   useEffect(() => {
+    
       setChatUsers(chatData.users);
       navigation.setOptions({
         headerShown:true,
