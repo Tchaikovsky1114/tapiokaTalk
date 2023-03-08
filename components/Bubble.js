@@ -2,11 +2,11 @@ import { Platform, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import colors from '../constants/colors'
 
-const Bubble = ({text,type}) => {
+const Bubble = ({text,type,date}) => {
 
   const bubbleStyle = {...styles.container}
   const textStyle = {...styles.text}
-
+  const wrapperStyle = {...styles.wrapper}
   switch (type) {
     case "system":
       textStyle.color = colors.deepGrey;
@@ -18,14 +18,27 @@ const Bubble = ({text,type}) => {
       bubbleStyle.backgroundColor = '#fff';
       bubbleStyle.borderWidth = 1;
       bubbleStyle.borderColor = '#f41'
+      break;
+    case "myMessage":
+      wrapperStyle.justifyContent = 'flex-end';
+      bubbleStyle.backgroundColor = '#E7FED6';
+      bubbleStyle.maxWidth = '40%'
+      break;
+    case "theirMessage":
+      wrapperStyle.justifyContent = 'flex-start';
+      bubbleStyle.backgroundColor = '#f3f70a';
+      bubbleStyle.maxWidth = '40%'
+      break;
+
     default:
       break;
   }
 
   return (
-    <View style={{flexDirection:'row',justifyContent:'center'}}>
+    <View style={wrapperStyle}>
       <View style={bubbleStyle}>
         <Text style={textStyle}>{text}</Text>
+        
       </View>
     </View>
   )
@@ -39,5 +52,9 @@ const styles = StyleSheet.create({
   },
   text:{
     fontFamily:'Medium',letterSpacing:0.3
+  },
+  wrapper: {
+    flexDirection:'row',
+    justifyContent:'center'
   }
 })

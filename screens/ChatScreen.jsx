@@ -6,6 +6,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   useWindowDimensions,
+  FlatList,
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { SimpleLineIcons } from '@expo/vector-icons';
@@ -22,15 +23,31 @@ import { createChat, sendTextMessage } from '../util/chatActions';
 const ChatScreen = ({route}) => {
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
-  const storedUsers = useSelector(state => state.user.storedUsers);
-  const userData = useSelector(state => state.auth.userData);
-  const storedChats = useSelector(state => state.chat.chatsData);
-  const chatMessages = useSelector(state => state.message.messagesData)
-
+  
   const [inputMessage, setInputMessage] = useState('');
   const [chatUsers,setChatUsers] = useState([]);
   const [chatId, setChatId] = useState(route?.params?.chatId)
   const [errorBannerText, setErrorBannerText] = useState(''); 
+
+  const storedUsers = useSelector(state => state.user.storedUsers);
+  const userData = useSelector(state => state.auth.userData);
+  const storedChats = useSelector(state => state.chat.chatsData);
+  const chatMessages = useSelector(state => {
+    if(!chatId) return;
+    const chatMessagesData = state.message.messagesData[chatId];
+
+    if (!chatMessagesData) return [];
+
+    const messageList = [];
+    for(const key in chatMessagesData) {
+      const message = chatMessagesData[key];
+      messageList.push({key,...message});
+    }
+
+    return messageList;
+  })
+
+
 
   const chatData = (chatId && storedChats[chatId]) || route?.params.users.newChatData;
   // console.log(chatMessages);
@@ -64,13 +81,13 @@ const ChatScreen = ({route}) => {
   }
   
   useEffect(() => {
-    setChatUsers(chatData.users);
-    navigation.setOptions({
-      headerShown:true,
-      headerTitle: getChatTitleFromName(),
-      headerShadowVisible: false,
-      headerTitleAlign:'center'
-    })
+      setChatUsers(chatData.users);
+      navigation.setOptions({
+        headerShown:true,
+        headerTitle: getChatTitleFromName(),
+        headerShadowVisible: false,
+        headerTitleAlign:'center'
+      })
   },[chatUsers])
 
   // useEffect(() => {
@@ -91,6 +108,22 @@ const ChatScreen = ({route}) => {
         <PageContainer style={{backgroundColor:'transparent'}}>
           {!chatId && <Bubble text="Hello world!" type="system" />}
           {errorBannerText && <Bubble text={errorBannerText} type="error" />}
+          {
+            chatId && (
+            <FlatList
+              data={chatMessages}
+              keyExtractor={(item) => item.key}
+              renderItem={({item}) => {
+                const message = item.text;
+                const date = item.sentAt;
+                const isMe = item.sentBy === userData.userId;
+
+                const messageType = isMe ? 'myMessage' : 'theirMessage'
+                return <Bubble text={message} date={date} type={messageType} />
+              }}
+            />
+            )
+          }
         </PageContainer>
       </ImageBackground>
 
