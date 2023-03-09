@@ -1,4 +1,4 @@
-import { child, push, ref, update } from "firebase/database";
+import { child, get, push, ref, update } from "firebase/database";
 import { database } from "../firebase";
 
 export const createChat = async (loggedInUserId, chatData) => {
@@ -50,6 +50,24 @@ export const sendTextMessage = async (chatId, senderId, messageText) => {
   
 
   } catch (error) {
-     
+     console.error(error);
+  }
+}
+
+export const starMessage = async (messageId, chatId, userId) => {
+  try {
+    const dbRef = ref(database);
+    const starredMessageRef = child(dbRef, `starredMessages/${userId}/${chatId}/${messageId}`);
+    
+    const snapshot = await get(starredMessageRef);
+
+    if(snapshot.exists()) {
+      console.log('unstarring');
+    } else {
+      console.log('starring'); 
+    }
+
+  } catch (error) {
+    console.error(error);
   }
 }
