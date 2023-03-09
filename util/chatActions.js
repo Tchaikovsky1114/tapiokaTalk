@@ -13,17 +13,17 @@ export const createChat = async (loggedInUserId, chatData) => {
 
   const dbRef = ref(database);
   // 새로운 채팅방 개설
-  const newChat = await push(child(dbRef, 'chats'), newChatData);
+  const newChat = push(child(dbRef, 'chats'), newChatData);
 
   const chatUsers = newChatData.users;
 
   for (let i = 0; i < chatUsers.length; i++) {
     const userId = chatUsers[i];
-    // 내가 들어가 있는 채팅방
-    await push(child(dbRef, `userChats/${userId}`), newChat.key);
+    // 내가 들어가 있는 채팅방 // 나와 대화하는 상대방의 채팅방 생성
+    push(child(dbRef, `userChats/${userId}`), newChat.key);
     // await push(child(dbRef, `chats/${userId}`), newChat.key);
   }
-
+  
   return newChat.key;
 }
 

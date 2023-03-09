@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
   FlatList,
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import backgroundImage from '../assets/images/tapioca-pearls.jpg';
 import { Octicons } from '@expo/vector-icons';
@@ -26,9 +26,10 @@ const ChatScreen = ({route}) => {
   
   const [inputMessage, setInputMessage] = useState('');
   const [chatUsers,setChatUsers] = useState([]);
-  const [chatId, setChatId] = useState(route?.params?.chatId)
+  
+  const [chatId, setChatId] = useState();
   const [errorBannerText, setErrorBannerText] = useState(''); 
-
+  const [chatData, setChatData] = useState();
   const storedUsers = useSelector(state => state.user.storedUsers);
   const userData = useSelector(state => state.auth.userData);
   const storedChats = useSelector(state => state.chat.chatsData);
@@ -48,40 +49,45 @@ const ChatScreen = ({route}) => {
     return messageList;
   })
 
+  const sendMessage = async () => {
 
-
-  const chatData = (chatId && storedChats[chatId]) || route?.params.newChatData;
-  console.log(chatData);
-  const sendMessage = useCallback(async () => {
     try {
-      
-      let id = chatId;
-        if(!id) {
+      if(!chatId) {
         // No chat Id. Create the chat
         // newChatData: 친구 목록 검색 후 친구를 클릭한 뒤 받아오는 친구와 나의 id가 담김.
-          id = await createChat(userData.userId,route?.params.newChatData);
-          setChatId(id);
-        }
+        const chatRoomKey = await createChat(userData.userId,route?.params.newChatData)
+        setChatId(chatRoomKey)
+        await sendTextMessage(chatRoomKey,userData.userId,inputMessage);
+      } else {
         await sendTextMessage(chatId,userData.userId,inputMessage);
-        setInputMessage('');
-      } catch (error) {
-        console.error(error);
-        setErrorBannerText('메세지 전송에 실패하였습니다.');
-        setTimeout(() => {
-          setErrorBannerText('')
-        }, 3000)
-    }
-
-    setInputMessage("");
-  },[inputMessage,chatId])
+      }
+    } catch (error) {
+      setErrorBannerText(`메세지 전송에 실패하였습니다.\n ERROR: ${error}`);
+      setTimeout(() => { setErrorBannerText('') }, 3000)
+    }  
+      setInputMessage('');
+  }
 
   const getChatTitleFromName = () => {
     const otherUserId = chatUsers.find((uid) => uid !== userData.userId);
     const otherUserData = storedUsers[otherUserId]
     return otherUserData && otherUserData.name;
   }
+
+
+
+
+  useLayoutEffect(() => {
+    setChatData((chatId && storedChats[chatId]) || route?.params.newChatData);
+  }, [chatUsers,chatId])
+
   useEffect(() => {
+    setChatId(route?.params?.chatId)
     
+  },[route.params])
+
+  useEffect(() => {
+    if(!chatData) return;
       setChatUsers(chatData.users);
       navigation.setOptions({
         headerShown:true,
@@ -89,7 +95,9 @@ const ChatScreen = ({route}) => {
         headerShadowVisible: false,
         headerTitleAlign:'center'
       })
-  },[chatUsers])
+  },[chatUsers,chatData,chatId])
+
+  
 
   // useEffect(() => {
   //   if(!chatId) return ;
