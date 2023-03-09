@@ -127,8 +127,8 @@ const ChatScreen = ({route}) => {
                 const date = item.sentAt;
                 const isMe = item.sentBy === userData.userId;
 
-                const messageType = isMe ? 'myMessage' : 'theirMessage'
-                return <Bubble text={message} date={date} type={messageType} />
+                const messageType = isMe ? 'myMessage' : 'theirMessage';
+                return <Bubble text={message} date={date} type={messageType} messageId={item.key} />
               }}
             />
             )

@@ -5,6 +5,7 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-m
 import * as ClipBoard from 'expo-clipboard';
 import uuid from 'react-native-uuid'
 import { Feather } from '@expo/vector-icons';
+import { starMessage } from '../util/chatActions';
 
 
 
@@ -75,7 +76,7 @@ const Bubble = ({ text, type, date }) => {
             <MenuTrigger />
             <MenuOptions>
                 <MenuItem icon="copy" text='글 복사하기' onSelect={() => copyToClipboard(text)} />
-                <MenuItem icon="star" text='Star' onSelect={() => {}} color="#bcbc11" />
+                <MenuItem icon="star" text='Star' onSelect={() => starMessage()} color="#bcbc11" />
             </MenuOptions>
           </Menu>
 
