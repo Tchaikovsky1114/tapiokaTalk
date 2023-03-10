@@ -1,11 +1,11 @@
-import { child, get, off, onValue, ref } from 'firebase/database';
+import { child, get, off, onValue, query, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import colors from '../constants/colors';
 import { database } from '../firebase';
 import { setChatsData } from '../store/chatSlice';
-import { setChatMessages } from '../store/messageSlice';
+import { setChatMessages, setStarredMessage } from '../store/messageSlice';
 import { setStoredUsers } from '../store/userSlice';
 
 import StackNavigator from './StackNavigator';
@@ -79,6 +79,15 @@ const MainNavigator = () => {
 
       
     })
+
+    const userStarredMessagesRef = child(dbRef, `starredMessages/${userData.userId}`);
+    refs.push(userStarredMessagesRef);
+    
+    onValue(userStarredMessagesRef, querySnapshot => {
+      const starredMessages = querySnapshot.val() ?? {};
+      dispatch(setStarredMessage({ starredMessages }));
+    })
+
     return () => {
       console.log("Unsubscribing to firebase listener");
       refs.forEach(ref => off(ref));

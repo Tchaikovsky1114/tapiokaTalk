@@ -1,12 +1,24 @@
 import { Platform, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import colors from '../constants/colors';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import * as ClipBoard from 'expo-clipboard';
 import uuid from 'react-native-uuid'
-import { Feather } from '@expo/vector-icons';
+import { AntDesign, Feather, FontAwesome } from '@expo/vector-icons';
 import { starMessage } from '../util/chatActions';
+import { useSelector } from 'react-redux';
 
+
+function formatDate(date) {
+  const convertDate = new Date(date);
+  let hours = convertDate.getHours();
+  let minutes = convertDate.getMinutes();
+  const ampm = hours >= 12 ? '오후' : '오전';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  minutes  = minutes < 10 ? '0' + minutes : minutes;
+  return `${ampm} ${hours} ${minutes}`;
+}
 
 
 const MenuItem = ({text, onSelect,iconPack, icon,color}) => {
@@ -20,15 +32,17 @@ const MenuItem = ({text, onSelect,iconPack, icon,color}) => {
   </MenuOption>
   }
 
-const Bubble = ({ text, type, date }) => {
+const Bubble = ({ text, type, date, userId, messageId, chatId }) => {
   const bubbleStyle = { ...styles.container };
   const textStyle = { ...styles.text };
   const wrapperStyle = { ...styles.wrapper };
+  const starredMessages = useSelector(state => state.message.starredMessages[chatId] || {});
   const menuRef = useRef(null);
   const id = useRef(uuid.v4());
   
+  
   let Container = View
-
+  let isUserMessage = false;
   switch (type) {
     case 'system':
       textStyle.color = colors.deepGrey;
@@ -44,14 +58,18 @@ const Bubble = ({ text, type, date }) => {
     case 'myMessage':
       wrapperStyle.justifyContent = 'flex-end';
       bubbleStyle.backgroundColor = '#E7FED6';
+      
       bubbleStyle.maxWidth = '40%';
-      Container = TouchableWithoutFeedback
+      Container = TouchableWithoutFeedback;
+      isUserMessage = true;
       break;
     case 'theirMessage':
       wrapperStyle.justifyContent = 'flex-start';
       bubbleStyle.backgroundColor = '#f3f70a';
+      
       bubbleStyle.maxWidth = '40%';
-      Container = TouchableWithoutFeedback
+      Container = TouchableWithoutFeedback;
+      isUserMessage = true;
       break;
 
     default:
@@ -65,21 +83,24 @@ const Bubble = ({ text, type, date }) => {
       console.error(error);
     }
   }
-
+  const isStarred = isUserMessage && starredMessages[messageId] !== undefined;
+  
   return (
     <View style={wrapperStyle}>
       <Container onLongPress={() =>menuRef.current.props.ctx.menuActions.openMenu(id.current)} style={{width: '100%'}}>
-        <View style={bubbleStyle}>
-          <Text style={textStyle}>{text}</Text>
-
+        <View style={[bubbleStyle,{justifyContent:'flex-start',alignItems:'flex-start'}]}>
+          <Text style={[textStyle,{lineHeight:22}]}>{text}</Text>
           <Menu name={id.current} ref={menuRef}>
             <MenuTrigger />
             <MenuOptions>
                 <MenuItem icon="copy" text='글 복사하기' onSelect={() => copyToClipboard(text)} />
-                <MenuItem icon="star" text='Star' onSelect={() => starMessage()} color="#bcbc11" />
+                <MenuItem iconPack={AntDesign} icon={isStarred ? 'star' : 'staro'} text={isStarred ? '보관함에서 삭제' : '보관함에 보관'} onSelect={() => starMessage(messageId,chatId,userId)} color="#bcbc11" />
             </MenuOptions>
-          </Menu>
-
+          </Menu>            
+          <View style={{flexDirection:'row'}}>
+              {isStarred && <FontAwesome name='star' size={14} color={colors.default} style={{marginRight:4}} />}
+            <Text style={{fontSize:10,color:'#a7a7a7',letterSpacing:0.3}}>{formatDate(date)}</Text>
+          </View>
         </View>
       </Container>
     </View>
@@ -91,7 +112,7 @@ export default Bubble;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    paddingVertical: Platform.OS === 'android' ? 0 : 12,
+    paddingVertical: Platform.OS === 'android' ? 6 : 12,
     paddingHorizontal: 8,
     borderRadius: 6,
     marginBottom: 10,
