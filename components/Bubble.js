@@ -6,7 +6,8 @@ import * as ClipBoard from 'expo-clipboard';
 import uuid from 'react-native-uuid'
 import { AntDesign, Feather, FontAwesome } from '@expo/vector-icons';
 import { starMessage } from '../util/chatActions';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setStoredUsers } from '../store/userSlice';
 
 
 function formatDate(date) {
@@ -32,14 +33,15 @@ const MenuItem = ({text, onSelect,iconPack, icon,color}) => {
   </MenuOption>
   }
 
-const Bubble = ({ text, type, date, userId, messageId, chatId, setReply }) => {
+const Bubble = ({ text, type, date, userId, messageId, chatId, setReply, reply, name }) => {
   const bubbleStyle = { ...styles.container };
   const textStyle = { ...styles.text };
   const wrapperStyle = { ...styles.wrapper };
   const starredMessages = useSelector(state => state.message.starredMessages[chatId] || {});
   const menuRef = useRef(null);
   const id = useRef(uuid.v4());
-  
+  const dispatch = useDispatch();
+  const storedUsers = useSelector(state => state.user.storedUsers)
   
   let Container = View
   let isUserMessage = false;
@@ -71,7 +73,10 @@ const Bubble = ({ text, type, date, userId, messageId, chatId, setReply }) => {
       Container = TouchableWithoutFeedback;
       isUserMessage = true;
       break;
-
+    case 'reply':
+      bubbleStyle.backgroundColor = '#ffe'
+      textStyle.color = '#a7a7a7'
+      break; 
     default:
       break;
   }
@@ -84,11 +89,18 @@ const Bubble = ({ text, type, date, userId, messageId, chatId, setReply }) => {
     }
   }
   const isStarred = isUserMessage && starredMessages[messageId] !== undefined;
-  
+  const replyingToUser = reply && storedUsers[reply.sentBy];
   return (
     <View style={wrapperStyle}>
       <Container onLongPress={() =>menuRef.current.props.ctx.menuActions.openMenu(id.current)} style={{width: '100%'}}>
         <View style={[bubbleStyle,{justifyContent:'flex-start',alignItems:'flex-start'}]}>
+          {
+            name && <Text style={{fontWeight:'bold',color:'#a7a7a7'}}>{name}님의 메시지</Text>
+          }
+          {
+            replyingToUser && <Bubble type='reply' text={reply.text} name={`${replyingToUser.name}`} />
+          }
+
           <Text style={[textStyle,{lineHeight:22}]}>{text}</Text>
           <Menu name={id.current} ref={menuRef}>
             <MenuTrigger />
@@ -100,7 +112,7 @@ const Bubble = ({ text, type, date, userId, messageId, chatId, setReply }) => {
           </Menu>            
           <View style={{flexDirection:'row'}}>
               {isStarred && <FontAwesome name='star' size={14} color={colors.default} style={{marginRight:4}} />}
-            <Text style={{fontSize:10,color:'#a7a7a7',letterSpacing:0.3}}>{formatDate(date)}</Text>
+            <Text style={{fontSize:10,color:'#a7a7a7',letterSpacing:0.3}}>{date && formatDate(date)}</Text>
           </View>
         </View>
       </Container>

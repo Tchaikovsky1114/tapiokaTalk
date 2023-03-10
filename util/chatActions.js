@@ -27,7 +27,7 @@ export const createChat = async (loggedInUserId, chatData) => {
   return newChat.key;
 }
 
-export const sendTextMessage = async (chatId, senderId, messageText) => {
+export const sendTextMessage = async (chatId, senderId, messageText, replyKey) => {
 
   try {
   const dbRef = ref(database);
@@ -38,6 +38,10 @@ export const sendTextMessage = async (chatId, senderId, messageText) => {
     sentBy : senderId,
     sentAt : new Date().toISOString(),
     text: messageText,
+  }
+
+  if(replyKey) {
+    messageData.reply = replyKey
   }
 
   await push(messagesRef, messageData);

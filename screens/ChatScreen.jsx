@@ -60,9 +60,11 @@ const ChatScreen = ({route}) => {
         // newChatData: 친구 목록 검색 후 친구를 클릭한 뒤 받아오는 친구와 나의 id가 담김.
         const chatRoomKey = await createChat(userData.userId,route?.params.newChatData)
         setChatId(chatRoomKey)
-        await sendTextMessage(chatRoomKey,userData.userId,inputMessage);
+        await sendTextMessage(chatRoomKey,userData.userId,inputMessage, reply && reply.key);
+        setReply(null);
       } else {
-        await sendTextMessage(chatId,userData.userId,inputMessage);
+        await sendTextMessage(chatId,userData.userId,inputMessage, reply && reply.key);
+        setReply(null);
       }
     } catch (error) {
       setErrorBannerText(`메세지 전송에 실패하였습니다.\n ERROR: ${error}`);
@@ -131,7 +133,17 @@ const ChatScreen = ({route}) => {
                 const isMe = item.sentBy === userData.userId;
 
                 const messageType = isMe ? 'myMessage' : 'theirMessage';
-                return <Bubble text={message} date={date} type={messageType} messageId={item.key} userId={userData.userId} chatId={chatId} setReply={() => setReply(item)} />
+                return <Bubble
+                text={message}
+                date={date}
+                type={messageType}
+                messageId={item.key}
+                userId={userData.userId}
+                name={item.name}
+                chatId={chatId}
+                setReply={() => setReply(item)}
+                reply={item.reply && chatMessages.find(i => i.key === item.reply)}
+                />
               }}
             />
             )
@@ -140,7 +152,7 @@ const ChatScreen = ({route}) => {
 
         {
           reply && (
-            <Reply onCancel={() => {}} text={reply.text} user={storedUsers[reply.sentBy] } />
+            <Reply onCancel={() => setReply(null)} text={reply.text} user={storedUsers[reply.sentBy] } />
           )
         }
 
