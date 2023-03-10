@@ -32,7 +32,7 @@ const MenuItem = ({text, onSelect,iconPack, icon,color}) => {
   </MenuOption>
   }
 
-const Bubble = ({ text, type, date, userId, messageId, chatId }) => {
+const Bubble = ({ text, type, date, userId, messageId, chatId, setReply }) => {
   const bubbleStyle = { ...styles.container };
   const textStyle = { ...styles.text };
   const wrapperStyle = { ...styles.wrapper };
@@ -94,6 +94,7 @@ const Bubble = ({ text, type, date, userId, messageId, chatId }) => {
             <MenuTrigger />
             <MenuOptions>
                 <MenuItem icon="copy" text='글 복사하기' onSelect={() => copyToClipboard(text)} />
+                <MenuItem icon="corner-down-left" text='답장하기' onSelect={setReply} />
                 <MenuItem iconPack={AntDesign} icon={isStarred ? 'star' : 'staro'} text={isStarred ? '보관함에서 삭제' : '보관함에 보관'} onSelect={() => starMessage(messageId,chatId,userId)} color="#bcbc11" />
             </MenuOptions>
           </Menu>            

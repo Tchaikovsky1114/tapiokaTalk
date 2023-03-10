@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   useWindowDimensions,
   FlatList,
+  Text,
 } from 'react-native';
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { SimpleLineIcons } from '@expo/vector-icons';
@@ -19,6 +20,7 @@ import { useSelector } from 'react-redux';
 import PageContainer from '../components/common/PageContainer';
 import Bubble from '../components/Bubble';
 import { createChat, sendTextMessage } from '../util/chatActions';
+import Reply from '../components/Reply';
 
 const ChatScreen = ({route}) => {
   const { height } = useWindowDimensions();
@@ -26,10 +28,11 @@ const ChatScreen = ({route}) => {
   
   const [inputMessage, setInputMessage] = useState('');
   const [chatUsers,setChatUsers] = useState([]);
-  
   const [chatId, setChatId] = useState();
   const [errorBannerText, setErrorBannerText] = useState(''); 
   const [chatData, setChatData] = useState();
+  const [reply,setReply] = useState();
+
   const storedUsers = useSelector(state => state.user.storedUsers);
   const userData = useSelector(state => state.auth.userData);
   const storedChats = useSelector(state => state.chat.chatsData);
@@ -128,12 +131,19 @@ const ChatScreen = ({route}) => {
                 const isMe = item.sentBy === userData.userId;
 
                 const messageType = isMe ? 'myMessage' : 'theirMessage';
-                return <Bubble text={message} date={date} type={messageType} messageId={item.key} userId={userData.userId} chatId={chatId} />
+                return <Bubble text={message} date={date} type={messageType} messageId={item.key} userId={userData.userId} chatId={chatId} setReply={() => setReply(item)} />
               }}
             />
             )
           }
         </PageContainer>
+
+        {
+          reply && (
+            <Reply onCancel={() => {}} text={reply.text} user={storedUsers[reply.sentBy] } />
+          )
+        }
+
       </ImageBackground>
 
       <KeyboardAvoidingView
